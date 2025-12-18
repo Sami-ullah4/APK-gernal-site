@@ -1,5 +1,5 @@
 import GamingApss from "./components/gamingApss/page";
-import { HeroSection } from "./components/hero-section/page";
+import HeroSection from "./components/hero-section/page";
 import SideBar from "./components/sideBar/page";
 
 export default function Home() {

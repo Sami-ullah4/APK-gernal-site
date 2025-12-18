@@ -38,7 +38,7 @@ export function HeroSection() {
   const currentSlide = slides[currentIndex];
 
   return (
-    <section className="relative w-full max-h-screen min-h-[490px] md:min-h-[600px]">
+    <section className=" relative w-full h-[600px] md:h-[700px] lg:h-[640px] overflow-hidden">
       <Image
         src={currentSlide.imageUrl}
         alt={currentSlide.alt}
@@ -54,7 +54,7 @@ export function HeroSection() {
 
       {/* Centered text */}
       <div className="relative z-10 flex h-full items-center justify-center text-center px-6">
-        <div className="max-w-4xl absolute top-32 border-0">
+        <div className="max-w-4xl absolute  top-56 border-0">
           <h1 className="text-5xl md:text-7xl font-bold text-white drop-shadow-2xl mb-4">
             Lagent Casino
           </h1>
@@ -62,24 +62,19 @@ export function HeroSection() {
             Where Luxury Meets Fortune
           </p>
         </div>
+
+        <Link
+          href={currentSlide.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-10  right-20  rounded-2xl  z-20 p-2 text-white text-lg font-semibold bg-[#72bf66]
+             "
+        >
+          Download Now
+        </Link>
       </div>
 
       {/* Dynamic button */}
-      <Link
-        href={currentSlide.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute bottom-10  right-20 rounded-full z-20 px-6 py-3 text-white font-semibold
-             bg-gradient-to-br 
-             from-pink-500 
-             via-purple-500 
-             to-indigo-600
-             hover:border-[1px]
-             hover:border-white
-             "
-      >
-        Visit Link
-      </Link>
     </section>
   );
 }

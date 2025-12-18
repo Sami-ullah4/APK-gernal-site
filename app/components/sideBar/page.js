@@ -18,15 +18,15 @@ export default function SideBar() {
     <aside className="w-full max-w-xs p-5 rounded-lg bg-white shadow-md text-gray-800">
       
       {/* Search Input */}
-      <div className="relative mb-6">
+      <div className="relative mb-6 ">
         <input
           type="text"
           value={query}
           onChange={handleSearch}
           placeholder="Search..."
-          className="w-full border border-gray-300 rounded-full py-3 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+          className="w-full border bg-[#72bf66] border-gray-300 rounded-full py-3 px-4 pl-10 text-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition"
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900" size={18} />
       </div>
 
       {/* Tags / Categories */}
