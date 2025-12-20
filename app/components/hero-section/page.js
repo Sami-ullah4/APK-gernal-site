@@ -1,83 +1,164 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export function HeroSection() {
+export default function HeroSection() {
   const slides = [
     {
       imageUrl: "/background.jpg",
-      link: "https://chatgpt.com/c/693c1793-ffd8-8322-be45-c010190a7068",
-      alt: "Lagent Casino - Luxury gaming experience 1",
+      title: "TikTok",
+      rating: "4.5",
+      category: "Social",
+      company: "TikTok Pte. Ltd.",
+      link: "#",
     },
     {
       imageUrl: "/background2.png",
-      link: "https://www.imgonline.com.ua/eng/delete-exif.php",
-      alt: "Lagent Casino - Luxury gaming experience 2",
+      title: "PUBG Mobile",
+      rating: "4.6",
+      category: "Games",
+      company: "Tencent Games",
+      link: "#",
     },
     {
       imageUrl: "/background3.jpeg",
-      link: "https://www.imgonline.com.ua/eng/delete-exif.php",
-      alt: "Lagent Casino - Luxury gaming experience 3",
+      title: "Instagram",
+      rating: "4.4",
+      category: "Social",
+      company: "Meta",
+      link: "#",
     },
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0);
 
-  // Auto-slide every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-      );
+      setActiveSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  const currentSlide = slides[currentIndex];
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: 1, ease: "easeOut" } },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } },
+  };
+
+  const prevSlide = () =>
+    setActiveSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  const nextSlide = () => setActiveSlide((prev) => (prev + 1) % slides.length);
 
   return (
-    <section className=" relative w-full h-[600px] md:h-[700px] lg:h-[640px] overflow-hidden">
-      <Image
-        src={currentSlide.imageUrl}
-        alt={currentSlide.alt}
-        fill
-        priority
-        quality={75}
-        className="object-cover object-center transition-opacity duration-1000"
-        sizes="100vw"
-      />
+      <section className="relative pt-12 w-full overflow-hidden  md:h-[460px]  lg:h-[600px]">
+        {slides.map((slide, index) => (
+          <AnimatePresence key={index} mode="wait">
+            {activeSlide === index && (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 w-full h-full"
+              >
+                {/* Background Image */}
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.title}
+                  fill
+                  sizes="100vw"
+                  className="object-cover w-full h-full"
+                />
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+                {/* Dark Overlay */}
+                <div className="absolute inset-0 bg-black/60 z-5" />
 
-      {/* Centered text */}
-      <div className="relative z-10 flex h-full items-center justify-center text-center px-6">
-        <div className="max-w-4xl absolute  top-56 border-0">
-          <h1 className="text-5xl md:text-7xl font-bold text-white drop-shadow-2xl mb-4">
-            Lagent Casino
-          </h1>
-          <p className="text-xl md:text-3xl text-white/90 drop-shadow-lg font-light">
-            Where Luxury Meets Fortune
-          </p>
-        </div>
+                {/* Text + small image */}
+                <div className="absolute inset-0 left-1/6 -bottom-20 flex items-center px-8 md:px-16 z-10 pointer-events-none">
+                  <div className="flex items-center gap-6 pointer-events-auto">
+                    {/* Small Image */}
+                    <div className="w-32 h-32 md:w-40 md:h-40 relative shrink-0 rounded-xl overflow-hidden">
+                      <Image
+                        src={slide.imageUrl}
+                        alt={slide.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
 
-        <Link
-          href={currentSlide.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute bottom-10  right-20  rounded-2xl  z-20 p-2 text-white text-lg font-semibold bg-[#72bf66]
-             "
+                    {/* Text Content */}
+                    <motion.div
+                      variants={container}
+                      initial="hidden"
+                      animate="show"
+                      exit="hidden"
+                      className="text-white max-w-md"
+                    >
+                      <motion.h2
+                        variants={item}
+                        className="text-4xl md:text-5xl font-bold mb-3"
+                      >
+                        {slide.title}
+                      </motion.h2>
+                      <motion.p
+                        variants={item}
+                        className="text-base text-gray-300 mb-2"
+                      >
+                        ⭐ {slide.rating} | {slide.category} | {slide.company}
+                      </motion.p>
+                      <motion.div variants={item}>
+                        <Link
+                          href={slide.link}
+                          className="inline-flex items-center gap-2 mt-5 bg-green-500 hover:bg-green-600 transition px-6 py-3 rounded-xl text-sm font-semibold"
+                        >
+                          ⬇ Download
+                        </Link>
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        ))}
+
+        {/* Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute top-1/2 left-4 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/35 hover:bg-black/50 flex items-center justify-center text-white transition"
         >
-          Download Now
-        </Link>
-      </div>
+          <ChevronLeft size={24} />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute top-1/2 right-4 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/35 hover:bg-black/50 flex items-center justify-center text-white transition"
+        >
+          <ChevronRight size={24} />
+        </button>
 
-      {/* Dynamic button */}
-    </section>
+        {/* Dots */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveSlide(index)}
+              className={`w-3 h-3 rounded-full transition ${
+                activeSlide === index
+                  ? "bg-white"
+                  : "bg-white/50 hover:bg-white"
+              }`}
+            />
+          ))}
+        </div>
+      </section>
   );
 }
-
-// Provide a default export so Next.js page prerendering recognizes this as a valid component
-export default HeroSection;

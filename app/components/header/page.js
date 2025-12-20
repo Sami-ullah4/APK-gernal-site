@@ -6,7 +6,6 @@ import SearchInput from "../searchInput/page";
 import { useEffect, useState } from "react";
 
 export default function NavBar() {
-  const [scrolled, setScrolled] = useState(false);
   const [categories, setCategories] = useState([]);
 
   // Fetch categories
@@ -15,52 +14,35 @@ export default function NavBar() {
       const data = await getCategorieSlug();
       setCategories(data ?? []);
     };
-
     fetchCategories();
-  }, []);
-
-  // Scroll handler
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled((prev) => {
-        const isScrolled = window.scrollY > 50;
-        return prev !== isScrolled ? isScrolled : prev;
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
-      className={`lg:px-40 fixed top-0 left-0 w-full z-50 flex items-center justify-between transition-all duration-300
-          ${scrolled ? "bg-white shadow-md" : "bg-transparent"}
+      className={`bg-white lg:px-40 py-1 fixed top-0 left-0 w-full z-50 flex items-center justify-between transition-all duration-300
         `}
     >
-      <div className="text-white">logo</div>
+      {/* Categories */}
+      <div className="flex gap-4 items-center">
+        {/* logo */}
+        <div className="text-black">logo</div>
 
-      <div className="flex gap-4">
         {categories.map((category) => (
           <Link
             key={category?.slug}
             href={`/${category?.slug}`}
-            className="hover:underline capitalize text-red-500"
+            className="hover:text-green-500 capitalize text-gray-500"
           >
             {category?.name ?? "Category"}
           </Link>
         ))}
       </div>
-      {/* SEARCH INPUT */}
+
+      {/* Search Input */}
       <div
-        className={`
-    transition-all duration-300 ease-in-out
-    ${
-      scrolled
-        ? "opacity-0 -translate-y-4 pointer-events-none"
-        : "opacity-100 translate-y-0"
-    }
-  `}
+        className={`relative flex items-center transition-all duration-300 ease-in-out
+         
+        `}
       >
         <SearchInput />
       </div>
