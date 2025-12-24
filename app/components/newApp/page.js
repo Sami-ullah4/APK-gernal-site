@@ -51,7 +51,6 @@ export default async function NewApp() {
                     alt={item.title}
                     width={112}
                     height={112}
-                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </div>

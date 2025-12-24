@@ -1,8 +1,10 @@
 .singlePost {
-  max-width: 65ch;
+
+  max-width: 70%;
   margin-left: auto;
   margin-right: auto;
-  padding: 2.5rem; /* p-10 equivalent */
+padding-left: 12px;  
+padding-right: 12px;
 }
 
 .singlePost p {
@@ -94,6 +96,6 @@
   opacity: 0.9;
 }
 
-.content {
-  /* wrapper for injected HTML */
-}
+/* .content {
+  wrapper for injected HTML
+} */

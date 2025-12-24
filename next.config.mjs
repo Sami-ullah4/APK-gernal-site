@@ -6,7 +6,12 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "3001",
-        pathname: "http://localhost/wp-headless/server/graphql",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "3pattigoldgamer.me",
+        pathname: "/**",
       },
     ],
   },

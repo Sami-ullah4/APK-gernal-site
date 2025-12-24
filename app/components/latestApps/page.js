@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export default function LatestApps() {
   return (
+    
     <section className="flex-[70%] px-4 py-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">

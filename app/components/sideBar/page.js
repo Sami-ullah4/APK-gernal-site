@@ -8,7 +8,6 @@ export default function SideBar() {
 
   const handleSearch = (e) => {
     setQuery(e.target.value);
-    console.log("Searching for:", e.target.value);
   };
 
   // Example tags/items

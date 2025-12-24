@@ -1,37 +1,94 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getPostLite } from "@/lib/post";
+import { useAppDispatch } from "../../store/hooks";
+import { setPostsFromClient } from "../../store/slices/postsSlice";
+import { ChevronDown } from "lucide-react";
 
-export default function LoadMore({ initialPost, categorySlug }) {
-  const safeInitial =
-    initialPost ?? {
+
+export default function LoadMore({
+  posts,
+  pageInfo,
+  initialPost,
+  categorySlug,
+}) {
+  const defaultPageInfo = { hasNextPage: false, endCursor: null };
+  const dispatch = useAppDispatch();
+
+  // Snapshot of the initial list for "Show Less"
+  const [snapshot, setSnapshot] = useState(() => {
+    if (initialPost) {
+      return {
+        nodes: initialPost.nodes ?? [],
+        pageInfo: initialPost.pageInfo ?? defaultPageInfo,
+      };
+    }
+    return {
       nodes: [],
-      pageInfo: { hasNextPage: false, endCursor: null },
+      pageInfo: defaultPageInfo,
     };
+  });
 
-  const [post, setPost] = useState(safeInitial);
+  const [post, setPost] = useState(() =>
+    initialPost
+      ? {
+          nodes: initialPost.nodes ?? [],
+          pageInfo: initialPost.pageInfo ?? defaultPageInfo,
+        }
+      : {
+          nodes: posts ?? [],
+          pageInfo: pageInfo ?? defaultPageInfo,
+        }
+  );
   const [loading, setLoading] = useState(false);
+
+  // Keep local state in sync with Redux for the home page
+  useEffect(() => {
+    if (!initialPost && posts && pageInfo && snapshot.nodes.length === 0) {
+      const base = {
+        nodes: posts,
+        pageInfo: pageInfo ?? defaultPageInfo,
+      };
+      setSnapshot(base);
+      setPost(base);
+    }
+  }, [posts, pageInfo, initialPost, snapshot.nodes.length]);
 
   const handleLoadMore = async () => {
     if (!post?.pageInfo?.hasNextPage || loading) return;
     setLoading(true);
 
     try {
-      const morePost = await getPostLite(post.pageInfo.endCursor, {
-        key: "categoryName",
-        value: categorySlug,
-      });
+      const { getPostLite } = await import("@/lib/post");
 
-      setPost((prev) => ({
-        nodes: [...(prev?.nodes ?? []), ...(morePost?.nodes ?? [])],
-        pageInfo: morePost?.pageInfo ?? {
-          hasNextPage: false,
-          endCursor: null,
-        },
-      }));
+      const taxonomy =
+        categorySlug && categorySlug.length
+          ? { key: "categoryName", value: categorySlug }
+          : null;
+
+      const morePost = await getPostLite(post.pageInfo.endCursor, taxonomy);
+
+      setPost((prev) => {
+        const nextPost = {
+          nodes: [...(prev?.nodes ?? []), ...(morePost?.nodes ?? [])],
+          pageInfo: morePost?.pageInfo ?? defaultPageInfo,
+        };
+
+        // If we're on the main home feed (no categorySlug / initialPost),
+        // also persist appended posts into Redux so they survive navigation.
+        if (!categorySlug && !initialPost) {
+          dispatch(
+            setPostsFromClient({
+              nodes: nextPost.nodes,
+              pageInfo: nextPost.pageInfo,
+            })
+          );
+        }
+
+        return nextPost;
+      });
     } catch (err) {
       console.error("Error loading more posts:", err);
     } finally {
@@ -44,11 +101,9 @@ export default function LoadMore({ initialPost, categorySlug }) {
       {/* ✅ GRID MATCHED */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
         {(post?.nodes ?? []).map((item) => {
-          const src =
-            item?.featuredImage?.node?.sourceUrl || "/background.jpg";
+          const src = item?.featuredImage?.node?.sourceUrl || "/background.jpg";
           const rating =
-            item.rating ??
-            (Math.random() * (4.6 - 4.2) + 4.2).toFixed(1);
+            item.rating ?? (Math.random() * (4.6 - 4.2) + 4.2).toFixed(1);
 
           return (
             <Link key={item.slug} href={`/${item.slug}`} className="group">
@@ -95,9 +150,7 @@ export default function LoadMore({ initialPost, categorySlug }) {
                 {/* Rating */}
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-400 text-lg">★</span>
-                  <span className="text-gray-700 text-base">
-                    {rating}
-                  </span>
+                  <span className="text-gray-700 text-base">{rating}</span>
                 </div>
               </div>
             </Link>
@@ -105,23 +158,66 @@ export default function LoadMore({ initialPost, categorySlug }) {
         })}
       </div>
 
-      {/* Load More Button (unchanged logic) */}
-      <div className="w-full mt-8 flex justify-center">
+      {/* Load More / Show Less Button */}
+      <div className="w-full mt-8 flex items-center justify-center gap-2">
+        <hr className="w-full h-0.5 text-gray-400" />
         <button
-          onClick={handleLoadMore}
-          disabled={!post.pageInfo?.hasNextPage || loading}
+          onClick={async () => {
+            const canLoadMore = post?.pageInfo?.hasNextPage;
+            const hasExtra =
+              (post?.nodes?.length ?? 0) > (snapshot.nodes?.length ?? 0);
+            const isShowLessState = !canLoadMore && hasExtra;
+
+            if (loading) return;
+
+            // Show Less: revert to initial snapshot
+            if (isShowLessState) {
+              setPost(snapshot);
+
+              // Persist reverted state to Redux only for the main feed
+              if (!categorySlug && !initialPost) {
+                dispatch(
+                  setPostsFromClient({
+                    nodes: snapshot.nodes,
+                    pageInfo: snapshot.pageInfo,
+                  })
+                );
+              }
+              return;
+            }
+
+            // Otherwise, try to load more
+            if (canLoadMore) {
+              await handleLoadMore();
+            }
+          }}
+          disabled={
+            loading ||
+            (!post.pageInfo?.hasNextPage &&
+              (post?.nodes?.length ?? 0) <= (snapshot.nodes?.length ?? 0))
+          }
           className="
-            bg-red-800 text-white px-6 py-2 rounded-lg
+            text-gray-900 
             disabled:opacity-50
-            transition
+            transition text-nowrap
           "
         >
-          {loading
-            ? "Loading..."
-            : post.pageInfo?.hasNextPage
-            ? "Load More"
-            : "No More Posts"}
+          {loading ? (
+            "Loading..."
+          ) : !post.pageInfo?.hasNextPage &&
+            (post?.nodes?.length ?? 0) > (snapshot.nodes?.length ?? 0) ? (
+            <>
+              Show less <ChevronDown />
+            </>
+          ) : post.pageInfo?.hasNextPage ? (
+            <>
+              Load More <ChevronDown />
+            </>
+          ) : (
+            "All Posts Loaded!"
+          )}
         </button>
+        <hr className="w-full h-1 text-gray-400" />
       </div>
     </>
   );

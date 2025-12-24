@@ -5,160 +5,131 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { getPostLite } from "@/lib/post";
 
 export default function HeroSection() {
-  const slides = [
-    {
-      imageUrl: "/background.jpg",
-      title: "TikTok",
-      rating: "4.5",
-      category: "Social",
-      company: "TikTok Pte. Ltd.",
-      link: "#",
-    },
-    {
-      imageUrl: "/background2.png",
-      title: "PUBG Mobile",
-      rating: "4.6",
-      category: "Games",
-      company: "Tencent Games",
-      link: "#",
-    },
-    {
-      imageUrl: "/background3.jpeg",
-      title: "Instagram",
-      rating: "4.4",
-      category: "Social",
-      company: "Meta",
-      link: "#",
-    },
-  ];
-
+  const [posts, setPosts] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [loading, setLoading] = useState(true);
 
+  /* ---------- Fetch Posts ---------- */
   useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await getPostLite();
+        const nodes = res?.nodes || res?.posts?.nodes || [];
+        setPosts(nodes.slice(0, 4));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  /* ---------- Auto Slide ---------- */
+  useEffect(() => {
+    if (!posts.length) return;
+
     const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % slides.length);
+      setActiveSlide((p) => (p + 1) % posts.length);
     }, 5000);
+
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [posts]);
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 1, ease: "easeOut" } },
-  };
+  if (loading) return <div className="h-[60vh] flex items-center justify-center">Loading…</div>;
+  if (!posts.length) return null;
 
-  const item = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } },
-  };
-
-  const prevSlide = () =>
-    setActiveSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  const nextSlide = () => setActiveSlide((prev) => (prev + 1) % slides.length);
+  const currentPost = posts[activeSlide];
+  const featured =
+    currentPost?.featuredImage?.node?.sourceUrl || "/background.jpg";
 
   return (
-      <section className="relative pt-12 w-full overflow-hidden  md:h-[460px]  lg:h-[600px]">
-        {slides.map((slide, index) => (
-          <AnimatePresence key={index} mode="wait">
-            {activeSlide === index && (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 w-full h-full"
-              >
-                {/* Background Image */}
-                <Image
-                  src={slide.imageUrl}
-                  alt={slide.title}
-                  fill
-                  sizes="100vw"
-                  className="object-cover w-full h-full"
+    <section className="relative h-[70vh] overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentPost.slug}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0"
+        >
+          {/* ✅ ACTUAL FEATURED IMAGE */}
+          <Image
+            src={featured}
+            alt={currentPost.title}
+            fill
+            priority
+            className="object-cover"
+          />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/60 z-10" />
+
+          {/* Content */}
+          <div className="absolute inset-0 z-20 flex items-center px-8 md:px-20">
+            <div className="flex gap-6 max-w-3xl text-white">
+              {/* Thumbnail */}
+              <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden">
+                <Image src={featured} alt="" fill className="object-cover" />
+              </div>
+
+              <div>
+                <h1
+                  className="text-4xl md:text-5xl font-bold mb-3"
+                  dangerouslySetInnerHTML={{ __html: currentPost.title }}
                 />
 
-                {/* Dark Overlay */}
-                <div className="absolute inset-0 bg-black/60 z-5" />
+                <div
+                  className="text-gray-300 mb-5 line-clamp-3"
+                  dangerouslySetInnerHTML={{ __html: currentPost.excerpt }}
+                />
 
-                {/* Text + small image */}
-                <div className="absolute inset-0 left-1/6 -bottom-20 flex items-center px-8 md:px-16 z-10 pointer-events-none">
-                  <div className="flex items-center gap-6 pointer-events-auto">
-                    {/* Small Image */}
-                    <div className="w-32 h-32 md:w-40 md:h-40 relative shrink-0 rounded-xl overflow-hidden">
-                      <Image
-                        src={slide.imageUrl}
-                        alt={slide.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                <Link
+                  href={`/${currentPost.slug}`}
+                  className="inline-block bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold"
+                >
+                  ⬇ Read More
+                </Link>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
-                    {/* Text Content */}
-                    <motion.div
-                      variants={container}
-                      initial="hidden"
-                      animate="show"
-                      exit="hidden"
-                      className="text-white max-w-md"
-                    >
-                      <motion.h2
-                        variants={item}
-                        className="text-4xl md:text-5xl font-bold mb-3"
-                      >
-                        {slide.title}
-                      </motion.h2>
-                      <motion.p
-                        variants={item}
-                        className="text-base text-gray-300 mb-2"
-                      >
-                        ⭐ {slide.rating} | {slide.category} | {slide.company}
-                      </motion.p>
-                      <motion.div variants={item}>
-                        <Link
-                          href={slide.link}
-                          className="inline-flex items-center gap-2 mt-5 bg-green-500 hover:bg-green-600 transition px-6 py-3 rounded-xl text-sm font-semibold"
-                        >
-                          ⬇ Download
-                        </Link>
-                      </motion.div>
-                    </motion.div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        ))}
+      {/* Arrows */}
+      <button onClick={() => setActiveSlide((p) => (p === 0 ? posts.length - 1 : p - 1))}
+        className="nav-btn left-4">
+        <ChevronLeft />
+      </button>
 
-        {/* Arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute top-1/2 left-4 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/35 hover:bg-black/50 flex items-center justify-center text-white transition"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute top-1/2 right-4 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/35 hover:bg-black/50 flex items-center justify-center text-white transition"
-        >
-          <ChevronRight size={24} />
-        </button>
+      <button onClick={() => setActiveSlide((p) => (p + 1) % posts.length)}
+        className="nav-btn right-4">
+        <ChevronRight />
+      </button>
 
-        {/* Dots */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveSlide(index)}
-              className={`w-3 h-3 rounded-full transition ${
-                activeSlide === index
-                  ? "bg-white"
-                  : "bg-white/50 hover:bg-white"
-              }`}
+      {/* Thumbnails */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+        {posts.map((post, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveSlide(index)}
+            className={`relative w-14 h-14 rounded-lg overflow-hidden border ${
+              activeSlide === index ? "border-white" : "border-white/40"
+            }`}
+          >
+            <Image
+              src={post?.featuredImage?.node?.sourceUrl || "/background.jpg"}
+              alt=""
+              fill
+              className="object-cover"
             />
-          ))}
-        </div>
-      </section>
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
