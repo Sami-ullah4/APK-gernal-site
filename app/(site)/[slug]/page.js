@@ -1,34 +1,29 @@
 import CategoryView from "@/app/components/categoryView/page";
+import TagView from "@/app/components/tagView/page";
 import PostView from "@/app/components/postView/page";
-import { getCategorieDetal, getPostLite, GetSinglePost } from "@/lib/post";
+import { getPostLite, GetSinglePost, getTagDetail, getCategorieDetal } from "@/lib/post";
 import { notFound } from "next/navigation";
-
 export default async function SlugPage({ params, searchParams }) {
   const { slug } = await params;
-
-  const categoryName = slug.toLowerCase();
-
-  // Unwrap searchParams promise
   const sp = await searchParams;
   const endCursor = sp?.cursor ?? null;
 
-  // 1️⃣ Check if slug is a category
-  const category = await getCategorieDetal(categoryName);
+  // 1️⃣ Check category
+  const category = await getCategorieDetal(slug);
   if (category) {
-    const postsData = await getPostLite(endCursor, {
-      key: "categoryName",
-      value: category.categoryName,
-    });
-
-    // if (!postsData?.nodes?.length) notFound();
-
-    return <CategoryView category={category} posts={postsData} />;
+    const posts = await getPostLite(endCursor, { key: "categorySlug", value: slug });
+    return <CategoryView category={category} posts={posts} />;
   }
 
-  // 2️⃣ Else, single post
+  // 2️⃣ Check tag
+  const tag = await getTagDetail(slug);
+  if (tag) {
+    const posts = await getPostLite(endCursor, { key: "tag", value: slug });
+    return <TagView tag={tag} posts={posts} />;
+  }
+
+  // 3️⃣ Single post fallback
   const post = await GetSinglePost(slug);
   if (!post) notFound();
- 
-
   return <PostView post={post} />;
 }

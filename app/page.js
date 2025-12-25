@@ -22,7 +22,7 @@ export default async function Home() {
       </div>
       <section className="px-36">
         <div className="text-gray-800 text-2xl font-bold py-6">All post</div>
-        {/* <BlogPosts /> */}
+        <BlogPosts />
       </section>
       {/* {pages.map((page) => (
         <Link

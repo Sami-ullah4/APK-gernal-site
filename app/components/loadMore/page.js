@@ -13,6 +13,7 @@ export default function LoadMore({
   pageInfo,
   initialPost,
   categorySlug,
+  taxonomy,
 }) {
   const defaultPageInfo = { hasNextPage: false, endCursor: null };
   const dispatch = useAppDispatch();
@@ -63,12 +64,13 @@ export default function LoadMore({
     try {
       const { getPostLite } = await import("@/lib/post");
 
-      const taxonomy =
-        categorySlug && categorySlug.length
+      const taxonomyParam =
+        taxonomy ??
+        (categorySlug && categorySlug.length
           ? { key: "categoryName", value: categorySlug }
-          : null;
+          : null);
 
-      const morePost = await getPostLite(post.pageInfo.endCursor, taxonomy);
+      const morePost = await getPostLite(post.pageInfo.endCursor, taxonomyParam);
 
       setPost((prev) => {
         const nextPost = {
@@ -78,7 +80,7 @@ export default function LoadMore({
 
         // If we're on the main home feed (no categorySlug / initialPost),
         // also persist appended posts into Redux so they survive navigation.
-        if (!categorySlug && !initialPost) {
+        if (!categorySlug && !taxonomy && !initialPost) {
           dispatch(
             setPostsFromClient({
               nodes: nextPost.nodes,

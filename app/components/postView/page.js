@@ -1,5 +1,6 @@
 import Image from "next/image";
 import styles from "./singlePost.module.css";
+import Link from "next/link";
 
 export default function PostView({ post }) {
   const safePost = post ?? {};
@@ -36,7 +37,9 @@ export default function PostView({ post }) {
           <h3 className="font-semibold mb-2">Tags:</h3>
           <ul className="list-disc list-inside">
             {tags.map((tag) => (
-              <li key={tag.id}>{tag.name}</li>
+              <Link key={tag.id} href={`/${tag.slug}`}>
+                {tag.name}
+              </Link>
             ))}
           </ul>
         </div>

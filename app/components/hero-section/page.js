@@ -112,7 +112,7 @@ export default function HeroSection() {
       </button>
 
       {/* Thumbnails */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+      {/* <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-30">
         {posts.map((post, index) => (
           <button
             key={index}
@@ -129,7 +129,7 @@ export default function HeroSection() {
             />
           </button>
         ))}
-      </div>
+      </div> */}
     </section>
   );
 }
