@@ -11,7 +11,7 @@ export default async function SlugPage({ params, searchParams }) {
   // 1️⃣ Check category
   const category = await getCategorieDetal(slug);
   if (category) {
-    const posts = await getPostLite(endCursor, { key: "categorySlug", value: slug });
+    const posts = await getPostLite(endCursor, { key: "categoryName", value: slug });
     return <CategoryView category={category} posts={posts} />;
   }
 

@@ -1,7 +1,5 @@
 "use client";
 
-// app/blog/page.js (CLIENT - uses Redux Toolkit state)
-import LoadMore from "../components/loadMore/page";
 import { useEffect } from "react";
 import {
   fetchPosts,
@@ -10,8 +8,9 @@ import {
   selectPostsPageInfo,
 } from "../store/slices/postsSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-
-export default function BlogPosts() {
+import dynamic from "next/dynamic";
+const LoadMore = dynamic(() => import(`../components/loadMore/page`));
+export default function Allpost() {
   const dispatch = useAppDispatch();
   const posts = useAppSelector(selectAllPosts);
   const status = useAppSelector(selectPostsStatus);
@@ -24,7 +23,7 @@ export default function BlogPosts() {
   }, [dispatch, status, posts.length]);
 
   return (
-    <div>
+    <div className="py-10">
       {/* Use Redux-powered posts; no local state */}
       <LoadMore posts={posts} pageInfo={pageInfo} />
     </div>
