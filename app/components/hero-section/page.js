@@ -71,7 +71,7 @@ export default function HeroSection() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60 z-10" />
       <div className="absolute inset-0 z-20 flex flex-col md:flex-row items-center md:justify-start md:pl-20 justify-center px-4 gap-2 ">
-        <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-xl overflow-hidden flex-shrink-0">
+        <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-xl overflow-hidden shrink-0">
           <Image
             src={IMAGE_SRC}
             alt={posts[activeSlide].title}

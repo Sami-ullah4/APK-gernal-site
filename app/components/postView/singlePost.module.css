@@ -1,10 +1,9 @@
 .singlePost {
-
-  max-width: 70%;
-  margin-left: auto;
-  margin-right: auto;
-padding-left: 12px;  
-padding-right: 12px;
+  border-radius: 0.5rem; /* 7px */
+  background-color: #ffffff;
+  padding: 20px;
+  box-shadow: -8px 0 20px rgba(0, 0, 0, 0.06), 8px 0 20px rgba(0, 0, 0, 0.06);
+  /* optional padding removed to let Tailwind handle spacing */
 }
 
 .singlePost p {
@@ -14,19 +13,34 @@ padding-right: 12px;
   margin-bottom: 1.25rem;
 }
 
-.singlePost a {
-  color: #2563eb; /* blue-600 */
-  transition: color .15s ease;
+/* 🔥 FIX: WordPress list with <a> directly inside <ul> */
+/* .singlePost ul:global(.list-disc.list-inside) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 0;
 }
 
-.singlePost a:hover {
-  color: #1e40af; /* blue-800 */
+.singlePost ul:global(.list-disc.list-inside) > a {
+  display: list-item; 
+  list-style-type: disc;
+  list-style-position: outside;
+  margin-left: 1.25rem;
+
+  color: #2563eb; 
+  line-height: 1.75rem;
+  text-decoration: none;
 }
+
+.singlePost ul:global(.list-disc.list-inside) > a:hover {
+  color: #1e40af;
+  text-decoration: underline;
+} */
 
 .singlePost h1 {
   font-size: 2.25rem; /* approx text-3xl */
   line-height: 1.1;
-  font-weight: 700;
+  font-weight: 600;
   color: #111827; /* gray-900 */
   margin-top: 0;
   margin-bottom: 1rem;
@@ -34,14 +48,14 @@ padding-right: 12px;
 
 .singlePost h2 {
   font-size: 1.875rem;
-  font-weight: 700;
+  font-weight: 400;
   margin-top: 3rem;
   margin-bottom: 1.5rem;
 }
 
 .singlePost h3 {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 400;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
@@ -50,12 +64,19 @@ padding-right: 12px;
 .singlePost ol {
   padding-left: 1.5rem;
   margin-bottom: 1.5rem;
+  list-style-position: outside;
 }
 
-.singlePost li {
-  color: #374151;
-  line-height: 1.75rem;
+.singlePost ul {
+  list-style-type: disc;
 }
+
+
+.singlePost ol {
+  list-style-type: decimal;
+}
+.singlePost li {
+margin-bottom: 4px;}
 
 .singlePost hr {
   margin: 3rem 0;
@@ -63,7 +84,8 @@ padding-right: 12px;
   border-top: 1px solid #d1d5db; /* gray-300 */
 }
 
-.singlePost .wp-block-button__link {
+.singlePost :global(.wp-block-button__link) {
+ 
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -74,8 +96,7 @@ padding-right: 12px;
   border-radius: 0.5rem;
 }
 
-/* Style WordPress-provided HTML classes (these are not transformed by CSS modules)
-   Use :global selector to target the raw class names inside the singlePost container. */
+/* WordPress global classes */
 .singlePost :global(.wp-block-buttons) {
   margin: 1.5rem 0;
 }
@@ -96,6 +117,6 @@ padding-right: 12px;
   opacity: 0.9;
 }
 
-/* .content {
-  wrapper for injected HTML
+/* .singlePost :global(.wp-block-list) {
+  background-color: #fbbf24;
 } */

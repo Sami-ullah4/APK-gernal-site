@@ -30,32 +30,3 @@ body {
     transform: translateX(120%);
   }
 }
-
-.shimmer-mask {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-/* Slight dim so shimmer is visible */
-.shimmer-mask > * {
-  opacity: 0.85;
-  background-color: #171717;
-}
-
-/* Shimmer overlay */
-.shimmer-mask::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255, 255, 255, var(--shimmer-opacity, 0.28)) 45%,
-    transparent 60%
-  );
-  transform: translateX(-120%);
-  animation: shimmer var(--shimmer-duration, 1.6s) linear infinite;
-  z-index: 20;
-  pointer-events: none;
-}

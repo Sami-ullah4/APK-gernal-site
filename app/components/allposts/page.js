@@ -6,10 +6,10 @@ import {
   selectAllPosts,
   selectPostsStatus,
   selectPostsPageInfo,
-} from "../store/slices/postsSlice";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+} from "../../store/slices/postsSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import dynamic from "next/dynamic";
-const LoadMore = dynamic(() => import(`../components/loadMore/page`));
+const LoadMore = dynamic(() => import(`../loadMore/page`));
 export default function Allpost() {
   const dispatch = useAppDispatch();
   const posts = useAppSelector(selectAllPosts);
